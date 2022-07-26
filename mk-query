@@ -1,0 +1,103 @@
+#!/usr/bin/python3
+
+import requests
+import readline
+import json
+import os
+import sys 
+import base64
+
+
+def check_apikey():
+    if api_header != None:
+        result = True
+    else:
+        result = False
+    return result
+
+def get_meta(path, org_id=None):
+    if org_id == None:
+        url = '{}{}/'.format(api_url, path)
+    else:
+        url = '{}/organizations/{}/{}'.format(api_url, org_id, path)
+    api_data = requests.get(url, headers=api_header)
+    return api_data, path
+
+def camera_screenshot(serial, net_id):
+    serial = serial.json()[0]['serial']
+    payload = '''{}'''
+    url = 'https://api.meraki.com/api/v0/networks/{}/cameras/{}/snapshot'.format(net_id, serial)
+    print('standby.... taking screenshot now')
+    api_data = requests.post(url, headers=api_header, data=payload)
+    print('*'*10)
+    print('Your image is available at: {}'.format(api_data.json()['url']))
+    _ans = input('would you like to exit? :')
+    if _ans == 'y'.lower():
+        sys.exit(0)
+    else:
+        return api_data
+
+def change_name():
+    print('this is the name change function')
+    pass
+
+def show_printer(key, api_result, org):
+    os.system('clear')
+    print('*'*10)
+    print('All {} listed for Org: {}'.format(key, org.json()[0]['name']))
+    print('*'*10)
+    for items in api_result:
+        print(json.dumps(items, indent=1))
+    reet = input('Please press any key to continue...')
+    return
+
+def render_menu():
+#    os.system('clear')
+    print('Loading tool.....')
+    org, key = get_meta('organizations')
+    org_id = org.json()[0]['id']
+    net, key = get_meta('networks', org_id)
+    net_id = net.json()[0]['id']
+    while True:
+        print('*'*10)
+        print('Meraki query tool')
+        print('*'*10)
+        if api_confirm == True:
+            print('API Key Loaded!')
+        print('Orginization ID: {}'.format(org_id))
+        print('API URL: {}'.format(api_url))
+        print('*'*10)
+        print('*'*10)
+        print('1.) List All devices')
+        print('2.) List All networks')
+        print('3.) Take Camera Screenshot')
+        print('4.) Exit\n')
+        ans = input('Please make a selection: ')
+        if ans == '1':
+            api_result, key = get_meta('devices', org_id) 
+            api_result = api_result.json()
+        elif ans == '2':
+            api_result, key = get_meta('networks', org_id) 
+            api_result = api_result.json()
+        elif ans == '3':
+            serial, key = get_meta('devices', org_id)
+            api_data = camera_screenshot(serial, net_id) 
+
+        elif ans == '4':
+            sys.exit(1)
+        if ans != '3':
+            show_printer(key, api_result, org)
+                
+
+###############consts
+try:
+    material = open('config', 'r')
+except FileNotFoundError: 
+    print('configuration file not missing, create it please')
+    exit(0)
+material =  base64.b64decode(material.read()).decode("utf-8")
+api_header = {'X-Cisco-Meraki-API-Key': material}   
+api_url = 'https://api.meraki.com/api/v1/'
+api_confirm = check_apikey()
+render_menu()
+
