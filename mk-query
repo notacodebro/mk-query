@@ -93,7 +93,7 @@ def render_menu():
 try:
     material = open('config', 'r')
 except FileNotFoundError: 
-    print('configuration file not missing, create it please')
+    print('!!!configuration file missing, create it please!!!!')
     exit(0)
 material =  base64.b64decode(material.read()).decode("utf-8")
 api_header = {'X-Cisco-Meraki-API-Key': material}   
