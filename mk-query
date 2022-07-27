@@ -17,19 +17,25 @@ def check_apikey():
         result = False
     return result
 
-def get_meta(path, org_id=None):
-    if org_id == None:
+def get_meta(path, ident=None, resource=None):
+    if ident == None:
         url = '{}{}/'.format(api_url, path)
-    else:
-        url = '{}/organizations/{}/{}'.format(api_url, org_id, path)
+    elif resource == 'org':
+        url = '{}/organizations/{}/{}'.format(api_url, ident, path)
+    elif resource =='net':
+        for items in ident:
+            url = '{}/networks/{}/{}'.format(api_url, items, path)
     api_data = requests.get(url, headers=api_header)
     return api_data, path
 
+    
+    
 def camera_screenshot(serial, net_id):
     serial = serial.json()[0]['serial']
     payload = '''{}'''
-    url = 'https://api.meraki.com/api/v0/networks/{}/cameras/{}/snapshot'.format(net_id, serial)
+    url = 'https://api.meraki.com/api/v1/devices/{}/camera/generateSnapshot'.format(serial)
     print('standby.... taking screenshot now')
+    print(url)
     api_data = requests.post(url, headers=api_header, data=payload)
     print('*'*10)
     print('Your image is available at: {}'.format(api_data.json()['url']))
@@ -39,9 +45,6 @@ def camera_screenshot(serial, net_id):
     else:
         return api_data
 
-def change_name():
-    print('this is the name change function')
-    pass
 
 def show_printer(key, api_result, org):
     os.system('clear')
@@ -66,8 +69,11 @@ def render_menu():
     print('Loading tool.....')
     org, key = get_meta('organizations')
     org_id = org.json()[0]['id']
-    net, key = get_meta('networks', org_id)
-    net_id = net.json()[0]['id']
+    net, key = get_meta('networks', org_id, 'org')
+    net = net.json()
+    netlist = []
+    for nets in range(len(net)):
+        netlist.append(net[nets]['id'])
     while True:
         print('*'*10)
         print('Meraki query tool')
@@ -81,19 +87,21 @@ def render_menu():
         print('1.) List All devices')
         print('2.) List All networks')
         print('3.) Take Camera Screenshot')
-        print('4.) Exit\n')
+        print('4.) List Clients\n')
         ans = input('Please make a selection: ')
         if ans == '1':
-            api_result, key = get_meta('devices', org_id) 
+            api_result, key = get_meta('devices', org_id, 'org') 
             api_result = api_result.json()
         elif ans == '2':
-            api_result, key = get_meta('networks', org_id) 
+            api_result, key = get_meta('networks', org_id, 'org') 
             api_result = api_result.json()
         elif ans == '3':
-            serial, key = get_meta('devices', org_id)
-            api_data = camera_screenshot(serial, net_id) 
-
+            serial, key = get_meta('devices', org_id, 'org')
+            api_data = camera_screenshot(serial, netlist) 
         elif ans == '4':
+            api_result, key = get_meta('clients', netlist, 'net')
+            api_result = api_result.json()
+        elif ans == '5':
             sys.exit(1)
         if ans != '3':
             show_printer(key, api_result, org)
