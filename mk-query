@@ -6,6 +6,8 @@ import json
 import os
 import sys 
 import base64
+from tabulate import tabulate
+
 
 
 def check_apikey():
@@ -46,8 +48,16 @@ def show_printer(key, api_result, org):
     print('*'*10)
     print('All {} listed for Org: {}'.format(key, org.json()[0]['name']))
     print('*'*10)
+    removed_keys = ['url', 'lng', 'lat', 'configurationUpdatedAt', 'firmware', 'sensor']
+    dict1 = []
     for items in api_result:
-        print(json.dumps(items, indent=1))
+        for key in removed_keys:
+            try:
+                items.pop(key)
+            except:
+                pass
+        dict1.append(items)
+    print(tabulate(dict1, headers='keys', tablefmt='psql'))
     reet = input('Please press any key to continue...')
     return
 
