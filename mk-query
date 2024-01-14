@@ -87,7 +87,8 @@ def render_menu():
         print('1.) List All devices')
         print('2.) List All networks')
         print('3.) Take Camera Screenshot')
-        print('4.) List Clients\n')
+        print('4.) List Clients')
+        print('5.) Exit\n')
         ans = input('Please make a selection: ')
         if ans == '1':
             api_result, key = get_meta('devices', org_id, 'org') 
