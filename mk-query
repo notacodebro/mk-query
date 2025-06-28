@@ -49,7 +49,7 @@ def camera_screenshot(serial, net_id):
 def show_printer(key, api_result, org):
     os.system('clear')
     print('*'*10)
-    print('All {} listed for Org: {}'.format(key, org.json()[0]['name']))
+    print(f'All {key} listed for Org: {org.json()[0]["name"]}')
     print('*'*10)
     removed_keys = ['url', 'lng', 'lat', 'configurationUpdatedAt', 'firmware', 'sensor']
     dict1 = []
@@ -81,8 +81,8 @@ def render_menu():
         print('*'*10)
         if api_confirm == True:
             print('API Key Loaded!')
-        print('Orginization ID: {}'.format(org_id))
-        print('API URL: {}'.format(api_url))
+        print(f'Orginization ID: {org_id}')
+        print('API URL: {api_irl}')
         print('*'*10)
         print('*'*10)
         print('1.) List All devices')
