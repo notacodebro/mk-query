@@ -19,7 +19,7 @@ def check_apikey():
 
 def get_meta(path, ident=None, resource=None):
     if ident == None:
-        url = '{}{}/'.format(api_url, path)
+        url = '{}/{}/'.format(api_url, path)
     elif resource == 'org':
         url = '{}/organizations/{}/{}'.format(api_url, ident, path)
     elif resource =='net':
@@ -60,6 +60,7 @@ def show_printer(key, api_result, org):
             except:
                 pass
         dict1.append(items)
+    print(dict1)
     print(tabulate(dict1, headers='keys', tablefmt='psql'))
     reet = input('Please press any key to continue...')
     return
@@ -114,9 +115,9 @@ try:
 except FileNotFoundError: 
     print('!!!configuration file missing, create it please!!!!')
     exit(0)
-material =  base64.b64decode(material.read()).decode("utf-8")
+material = base64.b64decode(material.read()).decode("utf-8").strip()
 api_header = {'X-Cisco-Meraki-API-Key': material}   
-api_url = 'https://api.meraki.com/api/v1/'
+api_url = 'https://api.meraki.com/api/v1'
 api_confirm = check_apikey()
 render_menu()
 
