@@ -19,12 +19,12 @@ def check_apikey():
 
 def get_meta(path, ident=None, resource=None):
     if ident == None:
-        url = '{}/{}/'.format(api_url, path)
+        url = f'{api_url}/{path}/'
     elif resource == 'org':
-        url = '{}/organizations/{}/{}'.format(api_url, ident, path)
+        url = f'{api_url}/organizations/{ident}/{path}'
     elif resource =='net':
         for items in ident:
-            url = '{}/networks/{}/{}'.format(api_url, items, path)
+            url = f'{api_url}/networks/{items}/{path}'
     api_data = requests.get(url, headers=api_header)
     return api_data, path
 
@@ -32,13 +32,13 @@ def get_meta(path, ident=None, resource=None):
     
 def camera_screenshot(serial, net_id):
     serial = serial.json()[0]['serial']
-    payload = '''{}'''
-    url = 'https://api.meraki.com/api/v1/devices/{}/camera/generateSnapshot'.format(serial)
+    url = f'https://api.meraki.com/api/v1/devices/{serial}/camera/generateSnapshot'
     print('standby.... taking screenshot now')
     print(url)
-    api_data = requests.post(url, headers=api_header, data=payload)
+    api_data = requests.post(url, headers=api_header)
     print('*'*10)
-    print('Your image is available at: {}'.format(api_data.json()['url']))
+    print(api_data)
+    print(f'Your image is available at: {api_data.json()["url"]}')
     _ans = input('would you like to exit? :')
     if _ans == 'y'.lower():
         sys.exit(0)
